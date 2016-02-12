@@ -17,4 +17,30 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+
+function getChildren($rowAll, $visualAssessmentTermIDParent, $level=0) {
+	$childrenCount=0 ;
+	$json="" ;
+	$jsonInt="" ;
+	
+	$json=$json=",\"children\": [" ;
+	
+	foreach ($rowAll AS $row) {
+		if ($row["visualAssessmentTermIDParent"]==$visualAssessmentTermIDParent) {
+			$childrenCount++ ;
+			$jsonInt.="{\"name\": \"" . $row["term"] . "\", \"class\": \"" . $row["visualAssessmentTermID"] . "\", \"level\": \"" . $level . "\"" ;
+			$jsonInt.=getChildren($rowAll, $row["visualAssessmentTermID"], ($level+1)) ;
+			$jsonInt.="}," ;
+		}
+	}
+	
+	if ($jsonInt!="") {
+		$jsonInt=substr($jsonInt, 0, -1) ;
+	}
+	$json.=$jsonInt ;
+	$json.="]" ;		
+	
+	return $json ;
+}
+			
 ?>

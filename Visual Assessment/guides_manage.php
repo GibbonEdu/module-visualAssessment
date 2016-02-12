@@ -34,11 +34,15 @@ else {
 	print "</div>" ;
 
 	$visualAssessmentGuideID=1 ;
+	$style="straight" ;
+	if (isset($_GET["style"])) {
+		$style=$_GET["style"] ;
+	}
 	
 	//Get terms in current guide
 	try {
 		$data=array("visualAssessmentGuideID"=>$visualAssessmentGuideID) ;
-		$sql="SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY visualAssessmentTermID" ; 
+		$sql="SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term" ; 
 		$result=$connection2->prepare($sql);
 		$result->execute($data);
 	}
@@ -71,51 +75,160 @@ else {
 			print "</div>" ;
 		}
 		else {
-			print "<link rel=\"stylesheet\" type=\"text/css\" href=\"./modules/Visual Assessment/js/jqcloud/jqcloud/jqcloud.css\" />" ;
-			print "<script type=\"text/javascript\" src=\"./modules/Visual Assessment/js/jqcloud/jqcloud/jqcloud.min.js\"></script>" ;
+			print "<script type=\"text/javascript\" src=\"./modules/Visual Assessment/js/d3/d3.min.js\"></script>" ;
 	
-			//Create table to hold clouds
-			print "<table class='blank' cellspacing='0' style='width:100%; margin-top: 20px'>" ;
-				$count=0 ;
-				$columns=1 ;
-		
-				for ($i=0; $i<$parentCount; $i++) {
-					//CREATE CLOUD
-					?>
-					<script type="text/javascript">
-						var word_list<?php print $i ?> = [
-							<?php
-							foreach ($rowAll AS $row) {
-								if ($row["visualAssessmentTermIDParent"]==$parents[$i][0]) {
-									print "{text: \"" . $row["term"] . "\", weight: '" . ($row["weight"]) . "'}," ;
-								}
-							}
-							?>
-							
-						];
-						$(function() {							
-							$("#cloud<?php print $i ?>").jQCloud(word_list<?php print $i ?>);
-						});
-					</script>
-					<?php
-					print "<div id='cloud$i' style='width: 100%; height: 300px; background-color: #eee; border: 1px solid black'>" ;
-						print "<div style='color: #aaa; font-size: 40px'>" . $parents[$i][1] . "</div>" ;
-					print "</div><br/>" ;
+			$myjson="{\"name\": \"\"" ;
+			$myjson.=getChildren($rowAll, "") ;
+			$myjson.="}" ;
+			?>
 			
-					if ($count%$columns==($columns-1)) {
-						print "</tr>" ;
+			<div style='text-align: center; text-transform: uppercase; font-size: 25px; margin-top: 25px; margin-bottom: 10px; color: #4883B5'>
+				Information & Communication Technology<br/>
+				<div style='text-transform: none; font-size: 60%'>
+					<?php
+						if ($style=="straight") {
+							print "Straight | <a href='./index.php?q=/modules/Visual Assessment/guides_manage.php&sidebar=false&style=round'>Round</a>" ;
+						}
+						else {
+							print "<a href='./index.php?q=/modules/Visual Assessment/guides_manage.php&sidebar=false&style=straight'>Straight</a> | Round" ;
+						}
+					?>
+				</div>
+			</div>
+			
+			<?php
+			if ($style=="straight") {
+				?>
+				<div id='tree' style='text-align: center; width: 100%; height: 2000px ; margin: 0 auto; font-weight: normal'></div>
+				<style>
+					.node circle {
+					  fill: #fff;
+					  stroke: steelblue;
+					  stroke-width: 1.5px;
 					}
-					$count++ ;
-				}
-		
-				for ($i=0;$i<$columns-($count%$columns);$i++) {
-					print "<td></td>" ;
-				}
-		
-				if ($count%$columns!=0) {
-					print "</tr>" ;
-				}
-			print "</table>" ;	
+					.node {
+					  font: 11px arial;
+					}
+					.link {
+					  fill: none;
+					  stroke: #ddd;
+					  stroke-width: 1.5px;
+					}
+					[data-name="0"] text {
+					  font-weight: bold ;
+					  text-decoration: underline ;
+					  fill: #9885DD;
+					  font-size: 16px ;
+					}
+					[data-name="1"] text {
+					  font-weight: bold ;
+					}
+				</style>
+				<script>
+					var width = 960,
+						height = 2000;
+					var tree = d3.layout.tree()
+						.size([height, width - 160]);
+					var diagonal = d3.svg.diagonal()
+						.projection(function(d) { return [d.y, d.x]; });
+					var svg = d3.select("#tree").append("svg")
+						.attr("width", width)
+						.attr("height", height)
+					  .append("g")
+						.attr("transform", "translate(40,0)");
+					var myjson='<?php print preg_replace( "/\r|\n/", "", $myjson );  ?>' ;
+					root = JSON.parse( myjson ); 
+					var nodes = tree.nodes(root),
+						links = tree.links(nodes);
+					var link = svg.selectAll("path.link")
+						.data(links)
+						.enter().append("path")
+						.attr("class", "link")
+						.attr("d", diagonal);
+					var node = svg.selectAll("g.node")
+						.data(nodes)
+						.enter().append("g")
+						.attr("class", "node")
+						.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
+						.attr("id", function(d) { return d.class; })
+						.attr("data-name", function(d) { return d.level; })
+					node.append("circle")
+						.attr("r", 4.5);
+
+					node.append("text")
+						.attr("dx", function(d) { return d.children ? -8 : 8; })
+						.attr("dy", 3)
+						.attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
+						.text(function(d) { return d.name; });
+					d3.select(self.frameElement).style("height", height + "px");
+				</script>
+				<?php
+			}
+			else if ($style=="round") {
+				?>
+				<div id='tree' style='text-align: center; width: 100%; height: 1000px ; margin: 0 auto; font-weight: normal'></div>
+				<style>
+					.node circle {
+					  fill: #fff;
+					  stroke: steelblue;
+					  stroke-width: 1.5px;
+					}
+					.node {
+					  font: 11px arial;
+					}
+					.link {
+					  fill: none;
+					  stroke: #ddd;
+					  stroke-width: 1.5px;
+					}
+					[data-name="0"] text {
+					  font-weight: bold ;
+					  text-decoration: underline ;
+					  fill: #9885DD;
+					}
+					[data-name="1"] text {
+					  font-weight: bold ;
+					}
+				</style>
+				<script>
+					var diameter = 1000;
+					var tree = d3.layout.tree()
+						.size([360, diameter / 2 - 120])
+						.separation(function(a, b) { return (a.parent == b.parent ? 1 : 2) / a.depth; });
+					var diagonal = d3.svg.diagonal.radial()
+						.projection(function(d) { return [d.y, d.x / 180 * Math.PI]; });
+					var svg = d3.select("#tree").append("svg")
+						.attr("width", diameter)
+						.attr("height", diameter)
+						.append("g")
+						.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
+					var myjson='<?php print preg_replace( "/\r|\n/", "", $myjson );  ?>' ;
+					root = JSON.parse( myjson ); 
+					var nodes = tree.nodes(root),
+						links = tree.links(nodes);
+					var link = svg.selectAll(".link")
+						.data(links)
+						.enter().append("path")
+						.attr("class", "link")
+						.attr("d", diagonal);
+					var node = svg.selectAll(".node")
+						.data(nodes)
+						.enter().append("g")
+						.attr("class", "node")
+						.attr("transform", function(d) { return "rotate(" + (d.x - 90) + ")translate(" + d.y + ")"; })
+						.attr("id", function(d) { return d.class; })
+						.attr("data-name", function(d) { return d.level; })
+					node.append("circle")
+					  .attr("r", 4.5);
+					node.append("text")
+					  .attr("dy", ".31em")
+					  .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+					  .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+					  .text(function(d) { return d.name; });
+					d3.select(self.frameElement).style("height", diameter - 150 + "px");
+				</script>
+				<?php
+			}
 		}
 	}
 }
