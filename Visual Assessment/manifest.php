@@ -30,8 +30,9 @@ $author="Ross Parker" ;
 $url="http://rossparker.org" ;
 
 //Module tables & gibbonSettings entries
-$moduleTables[0]="CREATE TABLE `visualAssessmentTerm` (  `visualAssessmentTermID` int(14) unsigned zerofill NOT NULL AUTO_INCREMENT,  `visualAssessmentGuideID` int(10) unsigned zerofill NOT NULL,  `term` varchar(20) NOT NULL,  `description` text NOT NULL,  `weight` int(2) NULL DEFAULT NULL, `visualAssessmentTermIDParent` int(14) unsigned zerofill  NULL DEFAULT NULL, PRIMARY KEY (`visualAssessmentTermID`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ; 
-
+$moduleTables[0]="CREATE TABLE `visualAssessmentGuide` ( `visualAssessmentGuideID` int(8) unsigned zerofill NOT NULL AUTO_INCREMENT, `name` varchar(50) NOT NULL, `category` varchar(50) NOT NULL, `description` text NOT NULL, `active` enum('Y','N') NOT NULL, `scope` enum('School','Learning Area') NOT NULL, `gibbonDepartmentID` int(4) unsigned zerofill DEFAULT NULL, `gibbonYearGroupIDList` varchar(255) NOT NULL, `gibbonPersonIDCreator` int(8) unsigned zerofill NOT NULL, PRIMARY KEY (`visualAssessmentGuideID`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8;";
+$moduleTables[1]="CREATE TABLE `visualAssessmentTerm` (  `visualAssessmentTermID` int(12) unsigned zerofill NOT NULL AUTO_INCREMENT,  `visualAssessmentGuideID` int(10) unsigned zerofill NOT NULL,  `term` varchar(20) NOT NULL,  `description` text NOT NULL,  `weight` int(2) NULL DEFAULT NULL, `visualAssessmentTermIDParent` int(14) unsigned zerofill  NULL DEFAULT NULL, PRIMARY KEY (`visualAssessmentTermID`)) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ; 
+$moduleTables[2]="CREATE TABLE `visualAssessmentAttainment` ( `visualAssessmentAttainmentID` int(14) unsigned zerofill NOT NULL AUTO_INCREMENT, `visualAssessmentTermID` int(12) unsigned zerofill NOT NULL, `gibbonPersonID` int(10) unsigned zerofill NOT NULL, `attainment` enum('1','2','3') DEFAULT NULL, `timestamp` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP, PRIMARY KEY (`visualAssessmentAttainmentID`) ) ENGINE=MyISAM DEFAULT CHARSET=utf8;" ;
 
 //Action rows 
 $actionRows[0]["name"]="Manage Assessment Guides_all" ; 

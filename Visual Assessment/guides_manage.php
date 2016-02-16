@@ -34,15 +34,11 @@ else {
 	print "</div>" ;
 
 	$visualAssessmentGuideID=1 ;
-	$style="straight" ;
-	if (isset($_GET["style"])) {
-		$style=$_GET["style"] ;
-	}
 	
-	//Get terms in current guide
+	//Check existence of current guide
 	try {
 		$data=array("visualAssessmentGuideID"=>$visualAssessmentGuideID) ;
-		$sql="SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term" ; 
+		$sql="SELECT * FROM visualAssessmentGuide WHERE visualAssessmentGuideID=:visualAssessmentGuideID" ; 
 		$result=$connection2->prepare($sql);
 		$result->execute($data);
 	}
@@ -50,123 +46,66 @@ else {
 		print "<div class='error'>" . $e->getMessage() . "</div>" ; 
 	}
 	
-	if ($result->rowCount()<1) {
+	if ($result->rowCount()!=1) {
 		print "<div class='error'>" ;
 		print _("There are no records to display.") ;
 		print "</div>" ;
 	}
 	else {
-		//Create array of terms
-		$rowAll=$result->fetchAll() ;
+		$row=$result->fetch() ;
 		
-		//Parse array to work out number of parent nodes
-		$parentCount=0 ;
-		$parents=array() ;
-		foreach ($rowAll AS $row) {
-			if ($row["visualAssessmentTermIDParent"]=="") {
-				$parents[$parentCount][0]=$row["visualAssessmentTermID"] ;
-				$parents[$parentCount][1]=$row["term"] ;
-				$parentCount++ ;
-			}
+		print "<div style='text-align: center; text-transform: uppercase; font-size: 25px; margin-top: 25px; margin-bottom: 0px; color: #4883B5'>" ;
+			print $row["name"] . "<br/>" ;
+			print "<div style='font-size: 65%; font-style: italic; color: #666; text-transform: none'>" ;
+				print $row["description"] ;
+			print "</div>" ;
+		print "</div>" ;
+	
+		//Get terms in current guide
+		try {
+			$data2=array("visualAssessmentGuideID"=>$visualAssessmentGuideID) ;
+			$sql2="SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term" ; 
+			$result2=$connection2->prepare($sql2);
+			$result2->execute($data2);
 		}
-		if ($parentCount<1) {
+		catch(PDOException $e) { 
+			print "<div class='error'>" . $e->getMessage() . "</div>" ; 
+		}
+	
+		if ($result2->rowCount()<1) {
 			print "<div class='error'>" ;
 			print _("There are no records to display.") ;
 			print "</div>" ;
 		}
 		else {
-			print "<script type=\"text/javascript\" src=\"./modules/Visual Assessment/js/d3/d3.min.js\"></script>" ;
-	
-			$myjson="{\"name\": \"\"" ;
-			$myjson.=getChildren($rowAll, "") ;
-			$myjson.="}" ;
-			?>
-			
-			<div style='text-align: center; text-transform: uppercase; font-size: 25px; margin-top: 25px; margin-bottom: 10px; color: #4883B5'>
-				Information & Communication Technology<br/>
-				<div style='text-transform: none; font-size: 60%'>
-					<?php
-						if ($style=="straight") {
-							print "Straight | <a href='./index.php?q=/modules/Visual Assessment/guides_manage.php&sidebar=false&style=round'>Round</a>" ;
-						}
-						else {
-							print "<a href='./index.php?q=/modules/Visual Assessment/guides_manage.php&sidebar=false&style=straight'>Straight</a> | Round" ;
-						}
-					?>
-				</div>
-			</div>
-			
-			<?php
-			if ($style=="straight") {
-				?>
-				<div id='tree' style='text-align: center; width: 100%; height: 2000px ; margin: 0 auto; font-weight: normal'></div>
-				<style>
-					.node circle {
-					  fill: #fff;
-					  stroke: steelblue;
-					  stroke-width: 1.5px;
-					}
-					.node {
-					  font: 11px arial;
-					}
-					.link {
-					  fill: none;
-					  stroke: #ddd;
-					  stroke-width: 1.5px;
-					}
-					[data-name="0"] text {
-					  font-weight: bold ;
-					  text-decoration: underline ;
-					  fill: #9885DD;
-					  font-size: 16px ;
-					}
-					[data-name="1"] text {
-					  font-weight: bold ;
-					}
-				</style>
-				<script>
-					var width = 960,
-						height = 2000;
-					var tree = d3.layout.tree()
-						.size([height, width - 160]);
-					var diagonal = d3.svg.diagonal()
-						.projection(function(d) { return [d.y, d.x]; });
-					var svg = d3.select("#tree").append("svg")
-						.attr("width", width)
-						.attr("height", height)
-					  .append("g")
-						.attr("transform", "translate(40,0)");
-					var myjson='<?php print preg_replace( "/\r|\n/", "", $myjson );  ?>' ;
-					root = JSON.parse( myjson ); 
-					var nodes = tree.nodes(root),
-						links = tree.links(nodes);
-					var link = svg.selectAll("path.link")
-						.data(links)
-						.enter().append("path")
-						.attr("class", "link")
-						.attr("d", diagonal);
-					var node = svg.selectAll("g.node")
-						.data(nodes)
-						.enter().append("g")
-						.attr("class", "node")
-						.attr("transform", function(d) { return "translate(" + d.y + "," + d.x + ")"; })
-						.attr("id", function(d) { return d.class; })
-						.attr("data-name", function(d) { return d.level; })
-					node.append("circle")
-						.attr("r", 4.5);
-
-					node.append("text")
-						.attr("dx", function(d) { return d.children ? -8 : 8; })
-						.attr("dy", 3)
-						.attr("text-anchor", function(d) { return d.children ? "end" : "start"; })
-						.text(function(d) { return d.name; });
-					d3.select(self.frameElement).style("height", height + "px");
-				</script>
-				<?php
+			//Create array of terms
+			$row2All=$result2->fetchAll() ;
+		
+			//Parse array to work out number of parent nodes
+			$parentCount=0 ;
+			$parents=array() ;
+			foreach ($row2All AS $row2) {
+				if ($row2["visualAssessmentTermIDParent"]=="") {
+					$parents[$parentCount][0]=$row2["visualAssessmentTermID"] ;
+					$parents[$parentCount][1]=$row2["term"] ;
+					$parentCount++ ;
+				}
 			}
-			else if ($style=="round") {
+			if ($parentCount<1) {
+				print "<div class='error'>" ;
+				print _("There are no records to display.") ;
+				print "</div>" ;
+			}
+			else {
+				print "<script type=\"text/javascript\" src=\"./modules/Visual Assessment/js/d3/d3.min.js\"></script>" ;
+			
+				$myjson="{\"name\": \"\"" ;
+				$myjson.=getChildren($row2All, "") ;
+				$myjson.="}" ;
+				
+			
 				?>
-				<div id='tree' style='text-align: center; width: 100%; height: 1000px ; margin: 0 auto; font-weight: normal'></div>
+				<div id='tree' style='padding-top: 120px; border: 1px solid #000; background: #BADBFB url("./modules/Visual Assessment/img/bg.png") no-repeat right top; text-align: center; width: 1000px; height: 1020px ; margin: 30px auto; font-weight: normal'></div>
 				<style>
 					.node circle {
 					  fill: #fff;
@@ -178,16 +117,17 @@ else {
 					}
 					.link {
 					  fill: none;
-					  stroke: #ddd;
+					  stroke: rgba(255,255,255,0.8);
 					  stroke-width: 1.5px;
 					}
 					[data-name="0"] text {
 					  font-weight: bold ;
-					  text-decoration: underline ;
-					  fill: #9885DD;
+					  fill: #000;
+					  font-size: 160% ;
 					}
 					[data-name="1"] text {
 					  font-weight: bold ;
+					  font-size: 118% ;
 					}
 				</style>
 				<script>
@@ -219,13 +159,39 @@ else {
 						.attr("id", function(d) { return d.class; })
 						.attr("data-name", function(d) { return d.level; })
 					node.append("circle")
-					  .attr("r", 4.5);
+					  	.attr("r", 4.5);
 					node.append("text")
-					  .attr("dy", ".31em")
-					  .attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
-					  .attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
-					  .text(function(d) { return d.name; });
+						.attr("dy", ".31em")
+						.attr("text-anchor", function(d) { return d.x < 180 ? "start" : "end"; })
+						.attr("transform", function(d) { return d.x < 180 ? "translate(8)" : "rotate(180)translate(-8)"; })
+						.text(function(d) { return d.name; })
+						.attr("title", function(d) { return d.title; })
+						.call(wrap, 100);  
 					d3.select(self.frameElement).style("height", diameter - 150 + "px");
+				
+					function wrap(text, width) {
+						text.each(function() {
+							var text = d3.select(this),
+								words = text.text().split(/\s+/).reverse(),
+								word,
+								line = [],
+								lineNumber = 0,
+								lineHeight = 0.7, // ems
+								y = text.attr("y"),
+								dy = parseFloat(text.attr("dy")),
+								tspan = text.text(null).append("tspan").attr("x", 0).attr("y", y).attr("dy", dy + "em");
+							while (word = words.pop()) {
+								line.push(word);
+								tspan.text(line.join(" "));
+								if (tspan.node().getComputedTextLength() > width) {
+									line.pop();
+									tspan.text(line.join(" "));
+									line = [word];
+									tspan = text.append("tspan").attr("x", 0).attr("y", y).attr("dy", ++lineNumber * lineHeight + dy + "em").text(word);
+							  	}
+							}
+						});
+					}
 				</script>
 				<?php
 			}

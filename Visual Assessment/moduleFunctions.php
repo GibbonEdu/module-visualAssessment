@@ -28,7 +28,11 @@ function getChildren($rowAll, $visualAssessmentTermIDParent, $level=0) {
 	foreach ($rowAll AS $row) {
 		if ($row["visualAssessmentTermIDParent"]==$visualAssessmentTermIDParent) {
 			$childrenCount++ ;
-			$jsonInt.="{\"name\": \"" . $row["term"] . "\", \"class\": \"" . $row["visualAssessmentTermID"] . "\", \"level\": \"" . $level . "\"" ;
+			$title=addslashes($row["term"]) ;
+			if ($row["description"]!="") {
+				$title=addslashes($row["term"]) . " - " . addslashes($row["description"]) ;
+			}
+			$jsonInt.="{\"name\": \"" . $row["term"] . "\", \"class\": \"" . $row["visualAssessmentTermID"] . "\", \"level\": \"" . $level . "\", \"title\": \"" . $title . "\"" ;
 			$jsonInt.=getChildren($rowAll, $row["visualAssessmentTermID"], ($level+1)) ;
 			$jsonInt.="}," ;
 		}
