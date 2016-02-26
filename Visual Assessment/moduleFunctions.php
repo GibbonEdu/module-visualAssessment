@@ -18,7 +18,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
 
-function getChildren($rowAll, $visualAssessmentTermIDParent, $level=0) {
+function getChildren($rowAll, $visualAssessmentTermIDParent, $level=0, $studentResults=NULL) {
 	$childrenCount=0 ;
 	$json="" ;
 	$jsonInt="" ;
@@ -33,7 +33,16 @@ function getChildren($rowAll, $visualAssessmentTermIDParent, $level=0) {
 				$title=addslashes($row["term"]) . " - " . addslashes($row["description"]) ;
 			}
 			$jsonInt.="{\"name\": \"" . $row["term"] . "\", \"class\": \"" . $row["visualAssessmentTermID"] . "\", \"level\": \"" . $level . "\", \"title\": \"" . $title . "\"" ;
-			$jsonInt.=getChildren($rowAll, $row["visualAssessmentTermID"], ($level+1)) ;
+			if ($studentResults!=NULL) {
+				foreach ($studentResults AS $studentResult) {
+					if ($studentResult["visualAssessmentTermID"]==$row["visualAssessmentTermID"]) {
+						$jsonInt.=", \"attainment\": \"" . "attainment" . $studentResult["attainment"] . "\"" ;
+						break ;
+					}
+				}
+			}
+			
+			$jsonInt.=getChildren($rowAll, $row["visualAssessmentTermID"], ($level+1), $studentResults) ;
 			$jsonInt.="}," ;
 		}
 	}
