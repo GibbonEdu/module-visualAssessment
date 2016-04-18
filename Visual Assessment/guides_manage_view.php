@@ -30,7 +30,7 @@ if (isActionAccessible($guid, $connection2, "/modules/Visual Assessment/guides_m
 }
 else {
 	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . _("Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > </div><div class='trailEnd'>" . _('Manage Guides') . "</div>" ;
+	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Manage Guides') . "</div>" ;
 	print "</div>" ;
 
 	$visualAssessmentGuideID=NULL ; //This is the guide we are viewing
@@ -44,7 +44,7 @@ else {
 	
 	if ($visualAssessmentGuideID=="") {
 		print "<div class='error'>" ;
-		print _("There are no records to display.") ;
+		print __($guid, "There are no records to display.") ;
 		print "</div>" ;
 	}
 	else {
@@ -61,7 +61,7 @@ else {
 	
 		if ($result->rowCount()!=1) {
 			print "<div class='error'>" ;
-			print _("There are no records to display.") ;
+			print __($guid, "There are no records to display.") ;
 			print "</div>" ;
 		}
 		else {
@@ -80,7 +80,7 @@ else {
 	
 			if ($result2->rowCount()<1) {
 				print "<div class='error'>" ;
-				print _("There are no records to display.") ;
+				print __($guid, "There are no records to display.") ;
 				print "</div>" ;
 			}
 			else {
@@ -99,7 +99,7 @@ else {
 				}
 				if ($parentCount<1) {
 					print "<div class='error'>" ;
-					print _("There are no records to display.") ;
+					print __($guid, "There are no records to display.") ;
 					print "</div>" ;
 				}
 				else {
@@ -142,7 +142,7 @@ else {
 				
 					if ($proceed!=TRUE) {
 						print "<div class='error'>" ;
-						print _("Your request failed due to a database error.") ;
+						print __($guid, "Your request failed due to a database error.") ;
 						print "</div>" ;
 					}
 					else {	

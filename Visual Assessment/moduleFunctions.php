@@ -38,7 +38,7 @@ function getChildren($rowAll, $visualAssessmentTermIDParent, $level=0, $studentR
 				foreach ($studentResults AS $studentResult) {
 					if ($studentResult["visualAssessmentTermID"]==$row["visualAssessmentTermID"]) {
 						$jsonInt.=", \"attainment\": \"" . "attainment" . $studentResult["attainment"] . "\"" ;
-						break ;
+						exit() ;
 					}
 				}
 			}

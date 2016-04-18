@@ -3,3 +3,4 @@ CHANGELOG
 v0.1.00
 -------
 Added basic database structures and landing page
+Gibbon Core v12 & PHP 7 Compatibility 

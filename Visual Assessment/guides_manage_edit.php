@@ -363,7 +363,7 @@ else {
 								print "<tr>" ;
 									print "<td colspan=2>" ;
 										print "<div class='error'>" ;
-										print _("There are no records to display.") ;
+										print __($guid, "There are no records to display.") ;
 										print "</div>" ;
 									print "</td>" ;
 								print "</tr>" ;
@@ -387,7 +387,7 @@ else {
 									print "<tr>" ;
 										print "<td colspan=2>" ;
 											print "<div class='error'>" ;
-											print _("There are no records to display.") ;
+											print __($guid, "There are no records to display.") ;
 											print "</div>" ;
 										print "</td>" ;
 									print "</tr>" ;
