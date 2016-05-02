@@ -17,154 +17,142 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start() ;
+@session_start();
 
 //Module includes
-include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
-if (isActionAccessible($guid, $connection2, "/modules/Visual Assessment/guides_manage.php")==FALSE) {
-	//Acess denied
-	print "<div class='error'>" ;
-		print "You do not have access to this action." ;
-	print "</div>" ;
-}
-else {
-	print "<div class='trail'>" ;
-	print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . getModuleName($_GET["q"]) . "</a> > </div><div class='trailEnd'>" . __($guid, 'Manage Guides') . "</div>" ;
-	print "</div>" ;
+if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_manage.php') == false) {
+    //Acess denied
+    echo "<div class='error'>";
+    echo 'You do not have access to this action.';
+    echo '</div>';
+} else {
+    echo "<div class='trail'>";
+    echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".getModuleName($_GET['q'])."</a> > </div><div class='trailEnd'>".__($guid, 'Manage Guides').'</div>';
+    echo '</div>';
 
-	$visualAssessmentGuideID=NULL ; //This is the guide we are viewing
-	if (isset($_GET["visualAssessmentGuideID"])) {
-		$visualAssessmentGuideID=$_GET["visualAssessmentGuideID"] ;
-	}
-	$gibbonPersonID=NULL ; //This is the student whose results we are viewing
-	if (isset($_GET["gibbonPersonID"])) {
-		$gibbonPersonID=$_GET["gibbonPersonID"] ;
-	}
-	
-	if ($visualAssessmentGuideID=="") {
-		print "<div class='error'>" ;
-		print __($guid, "There are no records to display.") ;
-		print "</div>" ;
-	}
-	else {
-		//Check existence of current guide
-		try {
-			$data=array("visualAssessmentGuideID"=>$visualAssessmentGuideID) ;
-			$sql="SELECT * FROM visualAssessmentGuide WHERE visualAssessmentGuideID=:visualAssessmentGuideID" ; 
-			$result=$connection2->prepare($sql);
-			$result->execute($data);
-		}
-		catch(PDOException $e) { 
-			print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-		}
-	
-		if ($result->rowCount()!=1) {
-			print "<div class='error'>" ;
-			print __($guid, "There are no records to display.") ;
-			print "</div>" ;
-		}
-		else {
-			$row=$result->fetch() ;
-		
-			//Get terms in current guide
-			try {
-				$data2=array("visualAssessmentGuideID"=>$visualAssessmentGuideID) ;
-				$sql2="SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term" ; 
-				$result2=$connection2->prepare($sql2);
-				$result2->execute($data2);
-			}
-			catch(PDOException $e) { 
-				print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-			}
-	
-			if ($result2->rowCount()<1) {
-				print "<div class='error'>" ;
-				print __($guid, "There are no records to display.") ;
-				print "</div>" ;
-			}
-			else {
-				//Create array of terms
-				$row2All=$result2->fetchAll() ;
-		
-				//Parse array to work out number of parent nodes
-				$parentCount=0 ;
-				$parents=array() ;
-				foreach ($row2All AS $row2) {
-					if ($row2["visualAssessmentTermIDParent"]=="") {
-						$parents[$parentCount][0]=$row2["visualAssessmentTermID"] ;
-						$parents[$parentCount][1]=$row2["term"] ;
-						$parentCount++ ;
-					}
-				}
-				if ($parentCount<1) {
-					print "<div class='error'>" ;
-					print __($guid, "There are no records to display.") ;
-					print "</div>" ;
-				}
-				else {
-					$proceed=TRUE ;
-					$studentResults=NULL ;
-				
-					//If a student is specified
-					if ($gibbonPersonID!=NULL) {
-						//Check student exists and is enroled					
-						try {
-							$data3=array("gibbonSchoolYearID"=>$_SESSION[$guid]["gibbonSchoolYearID"], "gibbonPersonID"=>$gibbonPersonID) ;
-							$sql3="SELECT surname, preferredName, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPerson.gibbonPersonID=:gibbonPersonID" ;
-							$result3=$connection2->prepare($sql3);
-							$result3->execute($data3);
-						}
-						catch(PDOException $e) { 
-							$proceed=FALSE ;
-						}
-						if ($result3->rowCount()!=1) {
-							$proceed=FALSE ;
-						}
-						else {
-							$row3=$result3->fetch() ;
-						
-							//Get and store student results
-							try {
-								$data4=array("visualAssessmentGuideID"=>$visualAssessmentGuideID, "gibbonPersonID"=>$gibbonPersonID) ;
-								$sql4="SELECT visualAssessmentAttainment.* FROM visualAssessmentAttainment JOIN visualAssessmentTerm ON (visualAssessmentAttainment.visualAssessmentTermID=visualAssessmentTerm.visualAssessmentTermID) JOIN visualAssessmentGuide ON (visualAssessmentTerm.visualAssessmentGuideID=visualAssessmentGuide.visualAssessmentGuideID) WHERE visualAssessmentGuide.visualAssessmentGuideID=:visualAssessmentGuideID AND visualAssessmentAttainment.gibbonPersonID=:gibbonPersonID" ;
-								$result4=$connection2->prepare($sql4);
-								$result4->execute($data4);
-							}
-							catch(PDOException $e) { 
-								$proceed=FALSE ; print $e->getMessage() ;
-							}
-							if ($result4->rowCount()>0) {
-								$studentResults=$result4->fetchall() ;
-							}
-						}
-					}
-				
-					if ($proceed!=TRUE) {
-						print "<div class='error'>" ;
-						print __($guid, "Your request failed due to a database error.") ;
-						print "</div>" ;
-					}
-					else {	
-				
-						print "<div style='text-align: center; text-transform: uppercase; font-size: 25px; margin-top: 25px; margin-bottom: 0px; color: #4883B5'>" ;
-							print $row["name"] . "<br/>" ;
-							print "<div style='font-size: 65%; font-style: italic; color: #666; text-transform: none'>" ;
-								print $row["description"] ;
-								if ($gibbonPersonID!=NULL) {
-									print " for " . formatName("", $row3["preferredName"], $row3["surname"], "Student") . " (" . $row3["rollGroup"] . ")" ;
-								}
-							print "</div>" ;
-						print "</div>" ;
-					
-						$myjson="{\"name\": \"\"" ;
-						$myjson.=getChildren($row2All, NULL, 0, $studentResults) ;
-						$myjson.="}" ;
-			
-						print "<script type=\"text/javascript\" src=\"./modules/Visual Assessment/js/d3/d3.min.js\"></script>" ;
-			
-			
-						?>
+    $visualAssessmentGuideID = null; //This is the guide we are viewing
+    if (isset($_GET['visualAssessmentGuideID'])) {
+        $visualAssessmentGuideID = $_GET['visualAssessmentGuideID'];
+    }
+    $gibbonPersonID = null; //This is the student whose results we are viewing
+    if (isset($_GET['gibbonPersonID'])) {
+        $gibbonPersonID = $_GET['gibbonPersonID'];
+    }
+
+    if ($visualAssessmentGuideID == '') {
+        echo "<div class='error'>";
+        echo __($guid, 'There are no records to display.');
+        echo '</div>';
+    } else {
+        //Check existence of current guide
+        try {
+            $data = array('visualAssessmentGuideID' => $visualAssessmentGuideID);
+            $sql = 'SELECT * FROM visualAssessmentGuide WHERE visualAssessmentGuideID=:visualAssessmentGuideID';
+            $result = $connection2->prepare($sql);
+            $result->execute($data);
+        } catch (PDOException $e) {
+            echo "<div class='error'>".$e->getMessage().'</div>';
+        }
+
+        if ($result->rowCount() != 1) {
+            echo "<div class='error'>";
+            echo __($guid, 'There are no records to display.');
+            echo '</div>';
+        } else {
+            $row = $result->fetch();
+
+            //Get terms in current guide
+            try {
+                $data2 = array('visualAssessmentGuideID' => $visualAssessmentGuideID);
+                $sql2 = 'SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term';
+                $result2 = $connection2->prepare($sql2);
+                $result2->execute($data2);
+            } catch (PDOException $e) {
+                echo "<div class='error'>".$e->getMessage().'</div>';
+            }
+
+            if ($result2->rowCount() < 1) {
+                echo "<div class='error'>";
+                echo __($guid, 'There are no records to display.');
+                echo '</div>';
+            } else {
+                //Create array of terms
+                $row2All = $result2->fetchAll();
+
+                //Parse array to work out number of parent nodes
+                $parentCount = 0;
+                $parents = array();
+                foreach ($row2All as $row2) {
+                    if ($row2['visualAssessmentTermIDParent'] == '') {
+                        $parents[$parentCount][0] = $row2['visualAssessmentTermID'];
+                        $parents[$parentCount][1] = $row2['term'];
+                        ++$parentCount;
+                    }
+                }
+                if ($parentCount < 1) {
+                    echo "<div class='error'>";
+                    echo __($guid, 'There are no records to display.');
+                    echo '</div>';
+                } else {
+                    $proceed = true;
+                    $studentResults = null;
+
+                    //If a student is specified
+                    if ($gibbonPersonID != null) {
+                        //Check student exists and is enroled					
+                        try {
+                            $data3 = array('gibbonSchoolYearID' => $_SESSION[$guid]['gibbonSchoolYearID'], 'gibbonPersonID' => $gibbonPersonID);
+                            $sql3 = 'SELECT surname, preferredName, gibbonRollGroup.name AS rollGroup FROM gibbonPerson JOIN gibbonStudentEnrolment ON (gibbonPerson.gibbonPersonID=gibbonStudentEnrolment.gibbonPersonID) JOIN gibbonRollGroup ON (gibbonStudentEnrolment.gibbonRollGroupID=gibbonRollGroup.gibbonRollGroupID) WHERE gibbonStudentEnrolment.gibbonSchoolYearID=:gibbonSchoolYearID AND gibbonPerson.gibbonPersonID=:gibbonPersonID';
+                            $result3 = $connection2->prepare($sql3);
+                            $result3->execute($data3);
+                        } catch (PDOException $e) {
+                            $proceed = false;
+                        }
+                        if ($result3->rowCount() != 1) {
+                            $proceed = false;
+                        } else {
+                            $row3 = $result3->fetch();
+
+                            //Get and store student results
+                            try {
+                                $data4 = array('visualAssessmentGuideID' => $visualAssessmentGuideID, 'gibbonPersonID' => $gibbonPersonID);
+                                $sql4 = 'SELECT visualAssessmentAttainment.* FROM visualAssessmentAttainment JOIN visualAssessmentTerm ON (visualAssessmentAttainment.visualAssessmentTermID=visualAssessmentTerm.visualAssessmentTermID) JOIN visualAssessmentGuide ON (visualAssessmentTerm.visualAssessmentGuideID=visualAssessmentGuide.visualAssessmentGuideID) WHERE visualAssessmentGuide.visualAssessmentGuideID=:visualAssessmentGuideID AND visualAssessmentAttainment.gibbonPersonID=:gibbonPersonID';
+                                $result4 = $connection2->prepare($sql4);
+                                $result4->execute($data4);
+                            } catch (PDOException $e) {
+                                $proceed = false;
+                                echo $e->getMessage();
+                            }
+                            if ($result4->rowCount() > 0) {
+                                $studentResults = $result4->fetchall();
+                            }
+                        }
+                    }
+
+                    if ($proceed != true) {
+                        echo "<div class='error'>";
+                        echo __($guid, 'Your request failed due to a database error.');
+                        echo '</div>';
+                    } else {
+                        echo "<div style='text-align: center; text-transform: uppercase; font-size: 25px; margin-top: 25px; margin-bottom: 0px; color: #4883B5'>";
+                        echo $row['name'].'<br/>';
+                        echo "<div style='font-size: 65%; font-style: italic; color: #666; text-transform: none'>";
+                        echo $row['description'];
+                        if ($gibbonPersonID != null) {
+                            echo ' for '.formatName('', $row3['preferredName'], $row3['surname'], 'Student').' ('.$row3['rollGroup'].')';
+                        }
+                        echo '</div>';
+                        echo '</div>';
+
+                        $myjson = '{"name": ""';
+                        $myjson .= getChildren($row2All, null, 0, $studentResults);
+                        $myjson .= '}';
+
+                        echo '<script type="text/javascript" src="./modules/Visual Assessment/js/d3/d3.min.js"></script>';
+
+                        ?>
 						<div id='tree' style='padding-top: 120px; border: 1px solid #000; background: #BADBFB url("./modules/Visual Assessment/img/bg.png") no-repeat right top; text-align: center; width: 1000px; height: 1020px ; margin: 30px auto; font-weight: normal'></div>
 						<style>
 							.attainment1 {
@@ -218,7 +206,8 @@ else {
 								.attr("height", diameter)
 								.append("g")
 								.attr("transform", "translate(" + diameter / 2 + "," + diameter / 2 + ")");
-							var myjson='<?php print preg_replace( "/\r|\n/", "", $myjson );  ?>' ;
+							var myjson='<?php echo preg_replace("/\r|\n/", '', $myjson);
+                        ?>' ;
 							root = JSON.parse( myjson ); 
 							var nodes = tree.nodes(root),
 								links = tree.links(nodes);
@@ -272,10 +261,11 @@ else {
 							}
 						</script>
 						<?php
-					}
-				}
-			}
-		}
-	}
+
+                    }
+                }
+            }
+        }
+    }
 }
 ?>

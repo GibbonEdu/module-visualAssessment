@@ -17,249 +17,131 @@ You should have received a copy of the GNU General Public License
 along with this program. If not, see <http://www.gnu.org/licenses/>.
 */
 
-@session_start() ;
+@session_start();
 
 //Module includes
-include "./modules/" . $_SESSION[$guid]["module"] . "/moduleFunctions.php" ;
+include './modules/'.$_SESSION[$guid]['module'].'/moduleFunctions.php';
 
 //Search & Filters
-$search=NULL ;
-if (isset($_GET["search"])) {
-	$search=$_GET["search"] ;
+$search = null;
+if (isset($_GET['search'])) {
+    $search = $_GET['search'];
 }
-$filter2=NULL ;
-if (isset($_GET["filter2"])) {
-	$filter2=$_GET["filter2"] ;
+$filter2 = null;
+if (isset($_GET['filter2'])) {
+    $filter2 = $_GET['filter2'];
 }
 
-if (isActionAccessible($guid, $connection2, "/modules/Visual Assessment/guides_manage_edit.php")==FALSE) {
-	//Acess denied
-	print "<div class='error'>" ;
-		print __($guid, "You do not have access to this action.") ;
-	print "</div>" ;
-}
-else {
-	//Get action with highest precendence
-	$highestAction=getHighestGroupedAction($guid, $_GET["q"], $connection2) ;
-	if ($highestAction==FALSE) {
-		print "<div class='error'>" ;
-		print __($guid, "The highest grouped action cannot be determined.") ;
-		print "</div>" ;
-	}
-	else {
-		if ($highestAction!="Manage Assessment Guides_all" AND $highestAction!="Manage Assessment Guides_myDepartments") {
-			print "<div class='error'>" ;
-				print __($guid, "You do not have access to this action.") ;
-			print "</div>" ;
-		}
-		else {
-			//Proceed!
-			print "<div class='trail'>" ;
-			print "<div class='trailHead'><a href='" . $_SESSION[$guid]["absoluteURL"] . "'>" . __($guid, "Home") . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/" . getModuleEntry($_GET["q"], $connection2, $guid) . "'>" . __($guid, getModuleName($_GET["q"])) . "</a> > <a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/" . getModuleName($_GET["q"]) . "/guides_manage.php&search=$search&filter2=$filter2'>" . __($guid, 'Manage Visual Assessment Guides') . "</a> > </div><div class='trailEnd'>" . __($guid, 'Edit Visual Assessment Guide') . "</div>" ;
-			print "</div>" ;
-			
-			if (isset($_GET["updateReturn"])) { $updateReturn=$_GET["updateReturn"] ; } else { $updateReturn="" ; }
-			$updateReturnMessage="" ;
-			$class="error" ;
-			if (!($updateReturn=="")) {
-				if ($updateReturn=="fail0") {
-					$updateReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
-				}
-				else if ($updateReturn=="fail1") {
-					$updateReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($updateReturn=="fail2") {
-					$updateReturnMessage=__($guid, "Your request failed due to a database error.") ;	
-				}
-				else if ($updateReturn=="fail3") {
-					$updateReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($updateReturn=="success0") {
-					$updateReturnMessage=__($guid, "Your request was completed successfully.") ;	
-					$class="success" ;
-				}
-				print "<div class='$class'>" ;
-					print $updateReturnMessage;
-				print "</div>" ;
-			} 
-			
-			if (isset($_GET["addReturn"])) { $addReturn=$_GET["addReturn"] ; } else { $addReturn="" ; }
-			$addReturnMessage="" ;
-			$class="error" ;
-			if (!($addReturn=="")) {
-				if ($addReturn=="success0") {
-					$addReturnMessage=__($guid, "Your request was completed successfully.") ;	
-					$class="success" ;
-				}
-				print "<div class='$class'>" ;
-					print $addReturnMessage;
-				print "</div>" ;
-			} 
-			
-			if (isset($_GET["columnDeleteReturn"])) { $columnDeleteReturn=$_GET["columnDeleteReturn"] ; } else { $columnDeleteReturn="" ; }
-			$columnDeleteReturnMessage="" ;
-			$class="error" ;
-			if (!($columnDeleteReturn=="")) {
-				if ($columnDeleteReturn=="fail0") {
-					$columnDeleteReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
-				}
-				else if ($columnDeleteReturn=="fail1") {
-					$columnDeleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($columnDeleteReturn=="fail2") {
-					$columnDeleteReturnMessage=__($guid, "Your request failed due to a database error.") ;	
-				}
-				else if ($columnDeleteReturn=="fail3") {
-					$columnDeleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($columnDeleteReturn=="success0") {
-					$columnDeleteReturnMessage=__($guid, "Your request was completed successfully.") ;	
-					$class="success" ;
-				}
-				print "<div class='$class'>" ;
-					print $columnDeleteReturnMessage;
-				print "</div>" ;
-			} 
-			
-			if (isset($_GET["rowDeleteReturn"])) { $rowDeleteReturn=$_GET["rowDeleteReturn"] ; } else { $rowDeleteReturn="" ; }
-			$rowDeleteReturnMessage="" ;
-			$class="error" ;
-			if (!($rowDeleteReturn=="")) {
-				if ($rowDeleteReturn=="fail0") {
-					$rowDeleteReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
-				}
-				else if ($rowDeleteReturn=="fail1") {
-					$rowDeleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($rowDeleteReturn=="fail2") {
-					$rowDeleteReturnMessage=__($guid, "Your request failed due to a database error.") ;	
-				}
-				else if ($rowDeleteReturn=="fail3") {
-					$rowDeleteReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($rowDeleteReturn=="success0") {
-					$rowDeleteReturnMessage=__($guid, "Your request was completed successfully.") ;	
-					$class="success" ;
-				}
-				print "<div class='$class'>" ;
-					print $rowDeleteReturnMessage;
-				print "</div>" ;
-			} 
-			
-			if (isset($_GET["cellEditReturn"])) { $cellEditReturn=$_GET["cellEditReturn"] ; } else { $cellEditReturn="" ; }
-			$cellEditReturnMessage="" ;
-			$class="error" ;
-			if (!($cellEditReturn=="")) {
-				if ($cellEditReturn=="fail0") {
-					$cellEditReturnMessage=__($guid, "Your request failed because you do not have access to this action.") ;	
-				}
-				else if ($cellEditReturn=="fail1") {
-					$cellEditReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($cellEditReturn=="fail2") {
-					$cellEditReturnMessage=__($guid, "Your request failed due to a database error.") ;	
-				}
-				else if ($cellEditReturn=="fail3") {
-					$cellEditReturnMessage=__($guid, "Your request failed because your inputs were invalid.") ;	
-				}
-				else if ($cellEditReturn=="fail5") {
-					$cellEditReturnMessage=__($guid, "Your request was successful, but some data was not properly saved.") ;	
-				}
-				else if ($cellEditReturn=="success0") {
-					$cellEditReturnMessage=__($guid, "Your request was completed successfully.") ;	
-					$class="success" ;
-				}
-				print "<div class='$class'>" ;
-					print $cellEditReturnMessage;
-				print "</div>" ;
-			} 
-			
-			//Check if school year specified
-			$visualAssessmentGuideID=$_GET["visualAssessmentGuideID"];
-			if ($visualAssessmentGuideID=="") {
-				print "<div class='error'>" ;
-					print __($guid, "You have not specified one or more required parameters.") ;
-				print "</div>" ;
-			}
-			else {
-				try {
-					$data=array("visualAssessmentGuideID"=>$visualAssessmentGuideID); 
-					$sql="SELECT * FROM visualAssessmentGuide WHERE visualAssessmentGuideID=:visualAssessmentGuideID" ;
-					$result=$connection2->prepare($sql);
-					$result->execute($data);
-				}
-				catch(PDOException $e) { 
-					print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-				}
-				
-				if ($result->rowCount()!=1) {
-					print "<div class='error'>" ;
-						print __($guid, "The specified record does not exist.") ;
-					print "</div>" ;
-				}
-				else {
-					//Let's go!
-					$row=$result->fetch() ;
-					
-					if ($search!="" OR $filter2!="") {
-						print "<div class='linkTop'>" ;
-							print "<a href='" . $_SESSION[$guid]["absoluteURL"] . "/index.php?q=/modules/Visual Assessment/guides_manage.php&search=$search&filter2=$filter2'>" . __($guid, 'Back to Search Results') . "</a>" ;
-						print "</div>" ;
-					}
-					?>
-					<form method="post" action="<?php print $_SESSION[$guid]["absoluteURL"] . "/modules/" . $_SESSION[$guid]["module"] . "/guides_manage_editProcess.php?visualAssessmentGuideID=$visualAssessmentGuideID&search=$search&filter2=$filter2" ?>">
-						<table class='smallIntBorder' cellspacing='0' style="width: 100%">	
+if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_manage_edit.php') == false) {
+    //Acess denied
+    echo "<div class='error'>";
+    echo __($guid, 'You do not have access to this action.');
+    echo '</div>';
+} else {
+    //Get action with highest precendence
+    $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
+    if ($highestAction == false) {
+        echo "<div class='error'>";
+        echo __($guid, 'The highest grouped action cannot be determined.');
+        echo '</div>';
+    } else {
+        if ($highestAction != 'Manage Assessment Guides_all' and $highestAction != 'Manage Assessment Guides_myDepartments') {
+            echo "<div class='error'>";
+            echo __($guid, 'You do not have access to this action.');
+            echo '</div>';
+        } else {
+            //Proceed!
+            echo "<div class='trail'>";
+            echo "<div class='trailHead'><a href='".$_SESSION[$guid]['absoluteURL']."'>".__($guid, 'Home')."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q']).'/'.getModuleEntry($_GET['q'], $connection2, $guid)."'>".__($guid, getModuleName($_GET['q']))."</a> > <a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.getModuleName($_GET['q'])."/guides_manage.php&search=$search&filter2=$filter2'>".__($guid, 'Manage Visual Assessment Guides')."</a> > </div><div class='trailEnd'>".__($guid, 'Edit Visual Assessment Guide').'</div>';
+            echo '</div>';
+
+            if (isset($_GET['return'])) {
+                returnProcess($guid, $_GET['return'], null, null);
+            }
+
+            //Check if school year specified
+            $visualAssessmentGuideID = $_GET['visualAssessmentGuideID'];
+            if ($visualAssessmentGuideID == '') {
+                echo "<div class='error'>";
+                echo __($guid, 'You have not specified one or more required parameters.');
+                echo '</div>';
+            } else {
+                try {
+                    $data = array('visualAssessmentGuideID' => $visualAssessmentGuideID);
+                    $sql = 'SELECT * FROM visualAssessmentGuide WHERE visualAssessmentGuideID=:visualAssessmentGuideID';
+                    $result = $connection2->prepare($sql);
+                    $result->execute($data);
+                } catch (PDOException $e) {
+                    echo "<div class='error'>".$e->getMessage().'</div>';
+                }
+
+                if ($result->rowCount() != 1) {
+                    echo "<div class='error'>";
+                    echo __($guid, 'The specified record does not exist.');
+                    echo '</div>';
+                } else {
+                    //Let's go!
+                    $row = $result->fetch();
+
+                    if ($search != '' or $filter2 != '') {
+                        echo "<div class='linkTop'>";
+                        echo "<a href='".$_SESSION[$guid]['absoluteURL']."/index.php?q=/modules/Visual Assessment/guides_manage.php&search=$search&filter2=$filter2'>".__($guid, 'Back to Search Results').'</a>';
+                        echo '</div>';
+                    }
+                    ?>
+					<form method="post" action="<?php echo $_SESSION[$guid]['absoluteURL'].'/modules/'.$_SESSION[$guid]['module']."/guides_manage_editProcess.php?visualAssessmentGuideID=$visualAssessmentGuideID&search=$search&filter2=$filter2" ?>">
+						<table class='smallIntBorder' cellspacing='0' style="width: 100%">
 							<tr class='break'>
 								<td colspan=2>
-									<h3><?php print __($guid, 'Visual Assessment Guide Basics') ?></h3>
+									<h3><?php echo __($guid, 'Visual Assessment Guide Basics') ?></h3>
 								</td>
 							</tr>
 							<tr>
-								<td style='width: 275px'> 
-									<b><?php print __($guid, 'Scope') ?> *</b><br/>
+								<td style='width: 275px'>
+									<b><?php echo __($guid, 'Scope') ?> *</b><br/>
 									<span style="font-size: 90%"><i></i></span>
 								</td>
 								<td class="right">
-									<input readonly name="scope" id="scope" value="<?php print $row["scope"] ?>" type="text" style="width: 300px">
+									<input readonly name="scope" id="scope" value="<?php echo $row['scope'] ?>" type="text" style="width: 300px">
 								</td>
 							</tr>
-							
+
 							<?php
-							if ($row["scope"]=="Learning Area") {
-								try {
-									$dataLearningArea=array("gibbonDepartmentID"=>$row["gibbonDepartmentID"]); 
-									$sqlLearningArea="SELECT * FROM gibbonDepartment WHERE gibbonDepartmentID=:gibbonDepartmentID" ;
-									$resultLearningArea=$connection2->prepare($sqlLearningArea);
-									$resultLearningArea->execute($dataLearningArea);
-								}
-								catch(PDOException $e) { 
-									print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-								}
-								if ($resultLearningArea->rowCount()==1) {
-									$rowLearningAreas=$resultLearningArea->fetch() ;
-								}
-								?>
+                            if ($row['scope'] == 'Learning Area') {
+                                try {
+                                    $dataLearningArea = array('gibbonDepartmentID' => $row['gibbonDepartmentID']);
+                                    $sqlLearningArea = 'SELECT * FROM gibbonDepartment WHERE gibbonDepartmentID=:gibbonDepartmentID';
+                                    $resultLearningArea = $connection2->prepare($sqlLearningArea);
+                                    $resultLearningArea->execute($dataLearningArea);
+                                } catch (PDOException $e) {
+                                    echo "<div class='error'>".$e->getMessage().'</div>';
+                                }
+                                if ($resultLearningArea->rowCount() == 1) {
+                                    $rowLearningAreas = $resultLearningArea->fetch();
+                                }
+                                ?>
 								<tr>
-									<td> 
-										<b><?php print __($guid, 'Learning Area') ?> *</b><br/>
+									<td>
+										<b><?php echo __($guid, 'Learning Area') ?> *</b><br/>
 										<span style="font-size: 90%"><i></i></span>
 									</td>
 									<td class="right">
-										<input readonly name="department" id="department" value="<?php print $rowLearningAreas["name"] ?>" type="text" style="width: 300px">
-										<input name="gibbonDepartmentID" id="gibbonDepartmentID" value="<?php print $row["gibbonDepartmentID"] ?>" type="hidden" style="width: 300px">
+										<input readonly name="department" id="department" value="<?php echo $rowLearningAreas['name'] ?>" type="text" style="width: 300px">
+										<input name="gibbonDepartmentID" id="gibbonDepartmentID" value="<?php echo $row['gibbonDepartmentID'] ?>" type="hidden" style="width: 300px">
 									</td>
 								</tr>
 								<?php
-							}
-							?>
-							
-							
+
+                            }
+                    ?>
+
+
 							<tr>
-								<td> 
-									<b><?php print __($guid, 'Name') ?> *</b><br/>
+								<td>
+									<b><?php echo __($guid, 'Name') ?> *</b><br/>
 								</td>
 								<td class="right">
-									<input name="name" id="name" maxlength=50 value="<?php print $row["name"] ?>" type="text" style="width: 300px">
+									<input name="name" id="name" maxlength=50 value="<?php echo $row['name'] ?>" type="text" style="width: 300px">
 									<script type="text/javascript">
 										var name2=new LiveValidation('name');
 										name2.add(Validate.Presence);
@@ -267,39 +149,45 @@ else {
 								</td>
 							</tr>
 							<tr>
-								<td> 
-									<b><?php print __($guid, 'Active') ?> *</b><br/>
+								<td>
+									<b><?php echo __($guid, 'Active') ?> *</b><br/>
 									<span style="font-size: 90%"><i></i></span>
 								</td>
 								<td class="right">
 									<select name="active" id="active" style="width: 302px">
-										<option <?php if ($row["active"]=="Y") { print "selected" ; } ?> value="Y"><?php print __($guid, 'Yes') ?></option>
-										<option <?php if ($row["active"]=="N") { print "selected" ; } ?> value="N"><?php print __($guid, 'No') ?></option>
+										<option <?php if ($row['active'] == 'Y') {
+    echo 'selected';
+}
+                    ?> value="Y"><?php echo __($guid, 'Yes') ?></option>
+										<option <?php if ($row['active'] == 'N') {
+    echo 'selected';
+}
+                    ?> value="N"><?php echo __($guid, 'No') ?></option>
 									</select>
 								</td>
 							</tr>
-							
+
 							<tr>
-								<td> 
-									<b><?php print __($guid, 'Category') ?></b><br/>
+								<td>
+									<b><?php echo __($guid, 'Category') ?></b><br/>
 								</td>
 								<td class="right">
-									<input name="category" id="category" maxlength=100 value="<?php print $row["category"] ?>" type="text" style="width: 300px">
+									<input name="category" id="category" maxlength=100 value="<?php echo $row['category'] ?>" type="text" style="width: 300px">
 									<script type="text/javascript">
 										$(function() {
 											var availableTags=[
 												<?php
-												try {
-													$dataAuto=array(); 
-													$sqlAuto="SELECT DISTINCT category FROM visualAssessmentGuide ORDER BY category" ;
-													$resultAuto=$connection2->prepare($sqlAuto);
-													$resultAuto->execute($dataAuto);
-												}
-												catch(PDOException $e) { }
-												while ($rowAuto=$resultAuto->fetch()) {
-													print "\"" . $rowAuto["category"] . "\", " ;
-												}
-												?>
+                                                try {
+                                                    $dataAuto = array();
+                                                    $sqlAuto = 'SELECT DISTINCT category FROM visualAssessmentGuide ORDER BY category';
+                                                    $resultAuto = $connection2->prepare($sqlAuto);
+                                                    $resultAuto->execute($dataAuto);
+                                                } catch (PDOException $e) {
+                                                }
+                    while ($rowAuto = $resultAuto->fetch()) {
+                        echo '"'.$rowAuto['category'].'", ';
+                    }
+                    ?>
 											];
 											$( "#category" ).autocomplete({source: availableTags});
 										});
@@ -307,98 +195,93 @@ else {
 								</td>
 							</tr>
 							<tr>
-								<td> 
-									<b><?php print __($guid, 'Description') ?></b><br/>
+								<td>
+									<b><?php echo __($guid, 'Description') ?></b><br/>
 								</td>
 								<td class="right">
-									<textarea name='description' id='description' rows=5 style='width: 300px'><?php print $row["description"] ?></textarea>
+									<textarea name='description' id='description' rows=5 style='width: 300px'><?php echo $row['description'] ?></textarea>
 								</td>
 							</tr>
 							<tr>
-								<td> 
-									<b><?php print __($guid, 'Year Groups') ?></b><br/>
+								<td>
+									<b><?php echo __($guid, 'Year Groups') ?></b><br/>
 								</td>
 								<td class="right">
-									<?php 
-									$yearGroups=getYearGroups($connection2) ;
-									if ($yearGroups=="") {
-										print "<i>" . __($guid, 'No year groups available.') . "</i>" ;
-									}
-									else {
-										for ($i=0; $i<count($yearGroups); $i=$i+2) {
-											$checked="" ;
-											if (is_numeric(strpos($row["gibbonYearGroupIDList"], $yearGroups[$i]))) {
-												$checked="checked " ;
-											}
-											print __($guid, $yearGroups[($i+1)]) . " <input $checked type='checkbox' name='gibbonYearGroupIDCheck" . ($i)/2 . "'><br/>" ; 
-											print "<input type='hidden' name='gibbonYearGroupID" . ($i)/2 . "' value='" . $yearGroups[$i] . "'>" ;
-										}
-									}
-									?>
-									<input type="hidden" name="count" value="<?php print (count($yearGroups))/2 ?>">
+									<?php
+                                    $yearGroups = getYearGroups($connection2);
+                    if ($yearGroups == '') {
+                        echo '<i>'.__($guid, 'No year groups available.').'</i>';
+                    } else {
+                        for ($i = 0; $i < count($yearGroups); $i = $i + 2) {
+                            $checked = '';
+                            if (is_numeric(strpos($row['gibbonYearGroupIDList'], $yearGroups[$i]))) {
+                                $checked = 'checked ';
+                            }
+                            echo __($guid, $yearGroups[($i + 1)])." <input $checked type='checkbox' name='gibbonYearGroupIDCheck".($i) / 2 ."'><br/>";
+                            echo "<input type='hidden' name='gibbonYearGroupID".($i) / 2 ."' value='".$yearGroups[$i]."'>";
+                        }
+                    }
+                    ?>
+									<input type="hidden" name="count" value="<?php echo(count($yearGroups)) / 2 ?>">
 								</td>
 							</tr>
 							<tr class='break'>
 								<td colspan=2>
-									<h3><?php print __($guid, 'Visual Assessment Guide Design') ?></h3>
+									<h3><?php echo __($guid, 'Visual Assessment Guide Design') ?></h3>
 								</td>
 							</tr>
 							<?php
-							//Get terms in current guide
-							try {
-								$data2=array("visualAssessmentGuideID"=>$visualAssessmentGuideID) ;
-								$sql2="SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term" ; 
-								$result2=$connection2->prepare($sql2);
-								$result2->execute($data2);
-							}
-							catch(PDOException $e) { 
-								print "<tr class='break'>" ;
-									print "<td colspan=2>" ;
-										print "<div class='error'>" . $e->getMessage() . "</div>" ; 
-									print "</td>" ;
-								print "</tr>" ;
-							}
+                            //Get terms in current guide
+                            try {
+                                $data2 = array('visualAssessmentGuideID' => $visualAssessmentGuideID);
+                                $sql2 = 'SELECT * FROM visualAssessmentTerm WHERE visualAssessmentGuideID=:visualAssessmentGuideID ORDER BY term';
+                                $result2 = $connection2->prepare($sql2);
+                                $result2->execute($data2);
+                            } catch (PDOException $e) {
+                                echo "<tr class='break'>";
+                                echo '<td colspan=2>';
+                                echo "<div class='error'>".$e->getMessage().'</div>';
+                                echo '</td>';
+                                echo '</tr>';
+                            }
 
-							if ($result2->rowCount()<1) {
-								print "<tr>" ;
-									print "<td colspan=2>" ;
-										print "<div class='error'>" ;
-										print __($guid, "There are no records to display.") ;
-										print "</div>" ;
-									print "</td>" ;
-								print "</tr>" ;
-							
-							}
-							else {
-								//Create array of terms
-								$row2All=$result2->fetchAll() ;
-	
-								//Parse array to work out number of parent nodes
-								$parentCount=0 ;
-								$parents=array() ;
-								foreach ($row2All AS $row2) {
-									if ($row2["visualAssessmentTermIDParent"]=="") {
-										$parents[$parentCount][0]=$row2["visualAssessmentTermID"] ;
-										$parents[$parentCount][1]=$row2["term"] ;
-										$parentCount++ ;
-									}
-								}
-								if ($parentCount<1) {
-									print "<tr>" ;
-										print "<td colspan=2>" ;
-											print "<div class='error'>" ;
-											print __($guid, "There are no records to display.") ;
-											print "</div>" ;
-										print "</td>" ;
-									print "</tr>" ;
-								}
-								else {
-									print "<tr>" ;
-										print "<td colspan=2>" ;
-											$allowOutcomeEditing=getSettingByScope($connection2, "Planner", "allowOutcomeEditing") ;
-											$categories=array() ;
-											$categoryCount=0 ;
-											?> 
+                    if ($result2->rowCount() < 1) {
+                        echo '<tr>';
+                        echo '<td colspan=2>';
+                        echo "<div class='error'>";
+                        echo __($guid, 'There are no records to display.');
+                        echo '</div>';
+                        echo '</td>';
+                        echo '</tr>';
+                    } else {
+                        //Create array of terms
+                                $row2All = $result2->fetchAll();
+
+                                //Parse array to work out number of parent nodes
+                                $parentCount = 0;
+                        $parents = array();
+                        foreach ($row2All as $row2) {
+                            if ($row2['visualAssessmentTermIDParent'] == '') {
+                                $parents[$parentCount][0] = $row2['visualAssessmentTermID'];
+                                $parents[$parentCount][1] = $row2['term'];
+                                ++$parentCount;
+                            }
+                        }
+                        if ($parentCount < 1) {
+                            echo '<tr>';
+                            echo '<td colspan=2>';
+                            echo "<div class='error'>";
+                            echo __($guid, 'There are no records to display.');
+                            echo '</div>';
+                            echo '</td>';
+                            echo '</tr>';
+                        } else {
+                            echo '<tr>';
+                            echo '<td colspan=2>';
+                            $allowOutcomeEditing = getSettingByScope($connection2, 'Planner', 'allowOutcomeEditing');
+                            $categories = array();
+                            $categoryCount = 0;
+                            ?>
 											<style>
 												#block { list-style-type: none; margin: 0; padding: 0; width: 100%; }
 												#block div.ui-state-default { margin: 0 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
@@ -421,29 +304,33 @@ else {
 											</script>
 											<div class="block" id="block" style='width: 100%; padding: 5px 0px 0px 0px; min-height: 66px'>
 												<?php
-												makeTermBlocks($guid, $connection2, $row2All, NULL, 0, NULL) ;
-												?>
+                                                makeTermBlocks($guid, $connection2, $row2All, null, 0, null);
+                            ?>
 											</div>
 										</td>
 									</tr>
 								<?php
-								}
-							}	
-							?>
+
+                        }
+                    }
+                    ?>
 						<tr>
 							<td>
-								<span style="font-size: 90%"><i>* <?php print __($guid, "denotes a required field") ; ?></i></span>
+								<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
+                    ?></i></span>
 							</td>
 							<td class="right">
-								<input type="hidden" name="address" value="<?php print $_SESSION[$guid]["address"] ?>">
-								<input type="submit" value="<?php print __($guid, "Submit") ; ?>">
+								<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
+								<input type="submit" value="<?php echo __($guid, 'Submit');
+                    ?>">
 							</td>
 						</tr>
 					</table>
 					<?php
-				}
-			}
-		}
-	}
+
+                }
+            }
+        }
+    }
 }
 ?>
