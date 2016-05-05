@@ -41,8 +41,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
         $gibbonPersonID = $_GET['gibbonPersonID'];
     }
 
-    if ($visualAssessmentGuideID == '') {
-        echo "<div class='error'>";
+    if ($visualAssessmentGuideID == '') { echo "<div class='error'>";
         echo __($guid, 'There are no records to display.');
         echo '</div>';
     } else {

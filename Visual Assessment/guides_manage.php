@@ -27,8 +27,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -97,112 +96,112 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
         echo "<form method='post' action='".$_SESSION[$guid]['absoluteURL'].'/index.php?q='.$_GET['q']."'>";
         echo"<table class='noIntBorder' cellspacing='0' style='width: 100%'>";
         ?>
-				<tr>
-					<td>
-						<b><?php echo __($guid, 'Search For') ?></b><br/>
-						<span style="font-size: 90%"><i><?php echo __($guid, 'Visual Assessment Guide name.') ?></i></span>
-					</td>
-					<td class="right">
-						<input name="search" id="search" maxlength=20 value="<?php echo $search ?>" type="text" style="width: 300px">
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<b><?php echo __($guid, 'Learning Areas') ?></b><br/>
-						<span style="font-size: 90%"><i></i></span>
-					</td>
-					<td class="right">
-						<?php
-                        echo "<select name='filter2' id='filter2' style='width:302px'>";
-        echo "<option value=''>".__($guid, 'All Learning Areas').'</option>';
-        try {
-            $dataSelect = array();
-            $sqlSelect = "SELECT * FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
-            $resultSelect = $connection2->prepare($sqlSelect);
-            $resultSelect->execute($dataSelect);
-        } catch (PDOException $e) {
-        }
-        while ($rowSelect = $resultSelect->fetch()) {
-            $selected = '';
-            if ($rowSelect['gibbonDepartmentID'] == $filter2) {
-                $selected = 'selected';
-            }
-            echo "<option $selected value='".$rowSelect['gibbonDepartmentID']."'>".$rowSelect['name'].'</option>';
-        }
-        echo '</select>';
-        ?>
-					</td>
-				</tr>
+		<tr>
+			<td>
+				<b><?php echo __($guid, 'Search For') ?></b><br/>
+				<span style="font-size: 90%"><i><?php echo __($guid, 'Visual Assessment Guide name.') ?></i></span>
+			</td>
+			<td class="right">
+				<input name="search" id="search" maxlength=20 value="<?php echo $search ?>" type="text" style="width: 300px">
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<b><?php echo __($guid, 'Learning Areas') ?></b><br/>
+				<span style="font-size: 90%"><i></i></span>
+			</td>
+			<td class="right">
 				<?php
-                echo '<tr>';
-        echo "<td class='right' colspan=2>";
-        echo "<input type='hidden' name='q' value='".$_GET['q']."'>";
-        echo "<input type='submit' value='".__($guid, 'Go')."'>";
-        echo '</td>';
-        echo '</tr>';
-        echo'</table>';
-        echo '</form>';
+				echo "<select name='filter2' id='filter2' style='width:302px'>";
+				echo "<option value=''>".__($guid, 'All Learning Areas').'</option>';
+				try {
+					$dataSelect = array();
+					$sqlSelect = "SELECT * FROM gibbonDepartment WHERE type='Learning Area' ORDER BY name";
+					$resultSelect = $connection2->prepare($sqlSelect);
+					$resultSelect->execute($dataSelect);
+				} catch (PDOException $e) {
+				}
+				while ($rowSelect = $resultSelect->fetch()) {
+					$selected = '';
+					if ($rowSelect['gibbonDepartmentID'] == $filter2) {
+						$selected = 'selected';
+					}
+					echo "<option $selected value='".$rowSelect['gibbonDepartmentID']."'>".$rowSelect['name'].'</option>';
+				}
+				echo '</select>';
+				?>
+			</td>
+		</tr>
+		<?php
+		echo '<tr>';
+		echo "<td class='right' colspan=2>";
+		echo "<input type='hidden' name='q' value='".$_GET['q']."'>";
+		echo "<input type='submit' value='".__($guid, 'Go')."'>";
+		echo '</td>';
+		echo '</tr>';
+		echo'</table>';
+		echo '</form>';
 
-        echo '<h3>';
-        echo __($guid, 'Visual Assessment Guides');
-        echo '</h3>';
-        if ($highestAction == 'Manage Assessment Guides_all' or $highestAction == 'Manage Assessment Guides_myDepartments') {
-            echo "<div class='linkTop'>";
-            echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/guides_manage_add.php&search=$search&filter2=$filter2'>".__($guid, 'Add')."<img style='margin-left: 5px' title='".__($guid, 'Add')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new.png'/></a>";
-            echo '</div>';
-        }
-        if ($result->rowCount() < 1) {
-            echo "<div class='error'>";
-            echo __($guid, 'There are no records to display.');
-            echo '</div>';
-        } else {
-            if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
-                printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top');
-            }
+		echo '<h3>';
+		echo __($guid, 'Visual Assessment Guides');
+		echo '</h3>';
+		if ($highestAction == 'Manage Assessment Guides_all' or $highestAction == 'Manage Assessment Guides_myDepartments') {
+			echo "<div class='linkTop'>";
+			echo "<a href='".$_SESSION[$guid]['absoluteURL'].'/index.php?q=/modules/'.$_SESSION[$guid]['module']."/guides_manage_add.php&search=$search&filter2=$filter2'>".__($guid, 'Add')."<img style='margin-left: 5px' title='".__($guid, 'Add')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/page_new.png'/></a>";
+			echo '</div>';
+		}
+		if ($result->rowCount() < 1) {
+			echo "<div class='error'>";
+			echo __($guid, 'There are no records to display.');
+			echo '</div>';
+		} else {
+			if ($result->rowCount() > $_SESSION[$guid]['pagination']) {
+				printPagination($guid, $result->rowCount(), $page, $_SESSION[$guid]['pagination'], 'top');
+			}
 
-            echo "<table cellspacing='0' style='width: 100%'>";
-            echo "<tr class='head'>";
-            echo '<th>';
-            echo __($guid, 'Scope');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Category');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Name');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Year Groups');
-            echo '</th>';
-            echo '<th>';
-            echo __($guid, 'Active');
-            echo '</th>';
-            echo "<th style='width: 130px'>";
-            echo __($guid, 'Actions');
-            echo '</th>';
-            echo '</tr>';
+			echo "<table cellspacing='0' style='width: 100%'>";
+			echo "<tr class='head'>";
+			echo '<th>';
+			echo __($guid, 'Scope');
+			echo '</th>';
+			echo '<th>';
+			echo __($guid, 'Category');
+			echo '</th>';
+			echo '<th>';
+			echo __($guid, 'Name');
+			echo '</th>';
+			echo '<th>';
+			echo __($guid, 'Year Groups');
+			echo '</th>';
+			echo '<th>';
+			echo __($guid, 'Active');
+			echo '</th>';
+			echo "<th style='width: 130px'>";
+			echo __($guid, 'Actions');
+			echo '</th>';
+			echo '</tr>';
 
-            $count = 0;
-            $rowNum = 'odd';
-            try {
-                $resultPage = $connection2->prepare($sqlPage);
-                $resultPage->execute($data);
-            } catch (PDOException $e) {
-                echo "<div class='error'>".$e->getMessage().'</div>';
-            }
-            while ($row = $resultPage->fetch()) {
-                if ($count % 2 == 0) {
-                    $rowNum = 'even';
-                } else {
-                    $rowNum = 'odd';
-                }
+			$count = 0;
+			$rowNum = 'odd';
+			try {
+				$resultPage = $connection2->prepare($sqlPage);
+				$resultPage->execute($data);
+			} catch (PDOException $e) {
+				echo "<div class='error'>".$e->getMessage().'</div>';
+			}
+			while ($row = $resultPage->fetch()) {
+				if ($count % 2 == 0) {
+					$rowNum = 'even';
+				} else {
+					$rowNum = 'odd';
+				}
 
-                if ($row['active'] != 'Y') {
-                    $rowNum = 'error';
-                }
+				if ($row['active'] != 'Y') {
+					$rowNum = 'error';
+				}
 
-                    //COLOR ROW BY STATUS!
-                    echo "<tr class=$rowNum>";
+				//COLOR ROW BY STATUS!
+				echo "<tr class=$rowNum>";
                 echo '<td>';
                 echo '<b>'.$row['scope'].'</b><br/>';
                 if ($row['scope'] == 'Learning Area' and $row['gibbonDepartmentID'] != '') {

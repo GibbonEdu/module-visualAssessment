@@ -40,8 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -133,8 +132,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 								<?php
 
                             }
-                    ?>
-
+                    		?>
 
 							<tr>
 								<td>
@@ -155,14 +153,8 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 								</td>
 								<td class="right">
 									<select name="active" id="active" style="width: 302px">
-										<option <?php if ($row['active'] == 'Y') {
-    echo 'selected';
-}
-                    ?> value="Y"><?php echo __($guid, 'Yes') ?></option>
-										<option <?php if ($row['active'] == 'N') {
-    echo 'selected';
-}
-                    ?> value="N"><?php echo __($guid, 'No') ?></option>
+										<option <?php if ($row['active'] == 'Y') { echo 'selected'; } ?> value="Y"><?php echo __($guid, 'Yes') ?></option>
+										<option <?php if ($row['active'] == 'N') { echo 'selected'; } ?> value="N"><?php echo __($guid, 'No') ?></option>
 									</select>
 								</td>
 							</tr>
@@ -184,10 +176,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
                                                     $resultAuto->execute($dataAuto);
                                                 } catch (PDOException $e) {
                                                 }
-                    while ($rowAuto = $resultAuto->fetch()) {
-                        echo '"'.$rowAuto['category'].'", ';
-                    }
-                    ?>
+												while ($rowAuto = $resultAuto->fetch()) {
+													echo '"'.$rowAuto['category'].'", ';
+												}
+												?>
 											];
 											$( "#category" ).autocomplete({source: availableTags});
 										});
@@ -209,19 +201,19 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 								<td class="right">
 									<?php
                                     $yearGroups = getYearGroups($connection2);
-                    if ($yearGroups == '') {
-                        echo '<i>'.__($guid, 'No year groups available.').'</i>';
-                    } else {
-                        for ($i = 0; $i < count($yearGroups); $i = $i + 2) {
-                            $checked = '';
-                            if (is_numeric(strpos($row['gibbonYearGroupIDList'], $yearGroups[$i]))) {
-                                $checked = 'checked ';
-                            }
-                            echo __($guid, $yearGroups[($i + 1)])." <input $checked type='checkbox' name='gibbonYearGroupIDCheck".($i) / 2 ."'><br/>";
-                            echo "<input type='hidden' name='gibbonYearGroupID".($i) / 2 ."' value='".$yearGroups[$i]."'>";
-                        }
-                    }
-                    ?>
+									if ($yearGroups == '') {
+										echo '<i>'.__($guid, 'No year groups available.').'</i>';
+									} else {
+										for ($i = 0; $i < count($yearGroups); $i = $i + 2) {
+											$checked = '';
+											if (is_numeric(strpos($row['gibbonYearGroupIDList'], $yearGroups[$i]))) {
+												$checked = 'checked ';
+											}
+											echo __($guid, $yearGroups[($i + 1)])." <input $checked type='checkbox' name='gibbonYearGroupIDCheck".($i) / 2 ."'><br/>";
+											echo "<input type='hidden' name='gibbonYearGroupID".($i) / 2 ."' value='".$yearGroups[$i]."'>";
+										}
+									}
+									?>
 									<input type="hidden" name="count" value="<?php echo(count($yearGroups)) / 2 ?>">
 								</td>
 							</tr>
@@ -245,84 +237,81 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
                                 echo '</tr>';
                             }
 
-                    if ($result2->rowCount() < 1) {
-                        echo '<tr>';
-                        echo '<td colspan=2>';
-                        echo "<div class='error'>";
-                        echo __($guid, 'There are no records to display.');
-                        echo '</div>';
-                        echo '</td>';
-                        echo '</tr>';
-                    } else {
-                        //Create array of terms
-                                $row2All = $result2->fetchAll();
+							if ($result2->rowCount() < 1) {
+								echo '<tr>';
+								echo '<td colspan=2>';
+								echo "<div class='error'>";
+								echo __($guid, 'There are no records to display.');
+								echo '</div>';
+								echo '</td>';
+								echo '</tr>';
+							} else {
+								//Create array of terms
+								$row2All = $result2->fetchAll();
 
-                                //Parse array to work out number of parent nodes
-                                $parentCount = 0;
-                        $parents = array();
-                        foreach ($row2All as $row2) {
-                            if ($row2['visualAssessmentTermIDParent'] == '') {
-                                $parents[$parentCount][0] = $row2['visualAssessmentTermID'];
-                                $parents[$parentCount][1] = $row2['term'];
-                                ++$parentCount;
-                            }
-                        }
-                        if ($parentCount < 1) {
-                            echo '<tr>';
-                            echo '<td colspan=2>';
-                            echo "<div class='error'>";
-                            echo __($guid, 'There are no records to display.');
-                            echo '</div>';
-                            echo '</td>';
-                            echo '</tr>';
-                        } else {
-                            echo '<tr>';
-                            echo '<td colspan=2>';
-                            $allowOutcomeEditing = getSettingByScope($connection2, 'Planner', 'allowOutcomeEditing');
-                            $categories = array();
-                            $categoryCount = 0;
-                            ?>
-											<style>
-												#block { list-style-type: none; margin: 0; padding: 0; width: 100%; }
-												#block div.ui-state-default { margin: 0 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
-												div.ui-state-default_dud { margin: 5px 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
-												html>body #block li { min-height: 58px; line-height: 1.2em; }
-												.block-ui-state-highlight { margin-bottom: 5px; min-height: 58px; line-height: 1.2em; width: 100%; }
-												block-ui-state-highlight {border: 1px solid #fcd3a1; background: #fbf8ee url(images/ui-bg_glass_55_fbf8ee_1x400.png) 50% 50% repeat-x; color: #444444; }
-												li { list-style-type: none }
-												ul.parent { margin-left: 0px ; }
-												ul.child { margin-left: 45px ; }
-											</style>
-											<script>
-												$(function() {
-													$( "#block" ).sortable({
-														placeholder: "block-ui-state-highlight",
-														axis: 'y',
-														item: 'li'
-													});
-												});
-											</script>
-											<div class="block" id="block" style='width: 100%; padding: 5px 0px 0px 0px; min-height: 66px'>
-												<?php
-                                                makeTermBlocks($guid, $connection2, $row2All, null, 0, null);
-                            ?>
-											</div>
-										</td>
-									</tr>
-								<?php
-
+								//Parse array to work out number of parent nodes
+								$parentCount = 0;
+								$parents = array();
+								foreach ($row2All as $row2) {
+									if ($row2['visualAssessmentTermIDParent'] == '') {
+										$parents[$parentCount][0] = $row2['visualAssessmentTermID'];
+										$parents[$parentCount][1] = $row2['term'];
+										++$parentCount;
+									}
+								}
+								if ($parentCount < 1) {
+									echo '<tr>';
+									echo '<td colspan=2>';
+									echo "<div class='error'>";
+									echo __($guid, 'There are no records to display.');
+									echo '</div>';
+									echo '</td>';
+									echo '</tr>';
+								} else {
+									echo '<tr>';
+									echo '<td colspan=2>';
+									$allowOutcomeEditing = getSettingByScope($connection2, 'Planner', 'allowOutcomeEditing');
+									$categories = array();
+									$categoryCount = 0;
+									?>
+									<style>
+										#block { list-style-type: none; margin: 0; padding: 0; width: 100%; }
+										#block div.ui-state-default { margin: 0 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
+										div.ui-state-default_dud { margin: 5px 0px 5px 0px; padding: 5px; font-size: 100%; min-height: 58px; }
+										html>body #block li { min-height: 58px; line-height: 1.2em; }
+										.block-ui-state-highlight { margin-bottom: 5px; min-height: 58px; line-height: 1.2em; width: 100%; }
+										block-ui-state-highlight {border: 1px solid #fcd3a1; background: #fbf8ee url(images/ui-bg_glass_55_fbf8ee_1x400.png) 50% 50% repeat-x; color: #444444; }
+										li { list-style-type: none }
+										ul.parent { margin-left: 0px ; }
+										ul.child { margin-left: 45px ; }
+									</style>
+									<script>
+										$(function() {
+											$( "#block" ).sortable({
+												placeholder: "block-ui-state-highlight",
+												axis: 'y',
+												item: 'li'
+											});
+										});
+									</script>
+									<div class="block" id="block" style='width: 100%; padding: 5px 0px 0px 0px; min-height: 66px'>
+										<?php
+										makeTermBlocks($guid, $connection2, $row2All, null, 0, null);
+										?>
+									</div>
+								</td>
+							</tr>
+						<?php
                         }
                     }
                     ?>
 						<tr>
 							<td>
-								<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
-                    ?></i></span>
+								<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 							</td>
 							<td class="right">
 								<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-								<input type="submit" value="<?php echo __($guid, 'Submit');
-                    ?>">
+								<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
 							</td>
 						</tr>
 					</table>

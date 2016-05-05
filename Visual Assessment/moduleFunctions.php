@@ -81,8 +81,7 @@ function makeTermBlocks($guid, $connection2, $rowAll, $visualAssessmentTermIDPar
 //Mode can be add, edit
 function makeTermBlock($guid, $connection2, $i, $term, $description = '', $weight = '', $visualAssessmentTermIDParent = '')
 {
-    echo "<li id='blockOuter$i' class='blockOuter'><div>";
-    ?>
+    echo "<li id='blockOuter$i' class='blockOuter'><div>"; ?>
 		<script type="text/javascript">
 			$(document).ready(function(){
 				$("#block<?php echo $i ?>").css("height","72px")
@@ -106,8 +105,7 @@ function makeTermBlock($guid, $connection2, $i, $term, $description = '', $weigh
 					<td style='text-align: right; width: 30%'>
 						<div style='margin-bottom: 5px'>
 							<?php
-                            echo "<img id='delete$i' title='".__($guid, 'Delete')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/> ";
-    ?>
+                            echo "<img id='delete$i' title='".__($guid, 'Delete')."' src='./themes/".$_SESSION[$guid]['gibbonThemeName']."/img/garbage.png'/> "; ?>
 						</div>
 					</td>
 				</tr>

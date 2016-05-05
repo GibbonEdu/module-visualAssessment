@@ -40,8 +40,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 } else {
     //Get action with highest precendence
     $highestAction = getHighestGroupedAction($guid, $_GET['q'], $connection2);
-    if ($highestAction == false) {
-        echo "<div class='error'>";
+    if ($highestAction == false) { echo "<div class='error'>";
         echo __($guid, 'The highest grouped action cannot be determined.');
         echo '</div>';
     } else {
@@ -104,7 +103,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 								<?php
 
                             }
-            ?>
+            				?>
 						</td>
 					</tr>
 
@@ -131,7 +130,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 						<?php
 
                     }
-            ?>
+            		?>
 					<tr id='learningAreaRow'>
 						<td>
 							<b><?php echo __($guid, 'Learning Area') ?> *</b><br/>
@@ -153,10 +152,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
                                     $resultSelect->execute($dataSelect);
                                 } catch (PDOException $e) {
                                 }
-            while ($rowSelect = $resultSelect->fetch()) {
-                echo "<option value='".$rowSelect['gibbonDepartmentID']."'>".$rowSelect['name'].'</option>';
-            }
-            ?>
+								while ($rowSelect = $resultSelect->fetch()) {
+									echo "<option value='".$rowSelect['gibbonDepartmentID']."'>".$rowSelect['name'].'</option>';
+								}
+								?>
 							</select>
 							<script type="text/javascript">
 								var gibbonDepartmentID=new LiveValidation('gibbonDepartmentID');
@@ -165,7 +164,7 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
                                 if ($highestAction == 'Manage Assessment Guides_all') {
                                     echo 'gibbonDepartmentID.disable();';
                                 }
-            ?>
+            					?>
 							</script>
 						</td>
 					</tr>
@@ -211,10 +210,10 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
                                             $resultAuto->execute($dataAuto);
                                         } catch (PDOException $e) {
                                         }
-            while ($rowAuto = $resultAuto->fetch()) {
-                echo '"'.$rowAuto['category'].'", ';
-            }
-            ?>
+										while ($rowAuto = $resultAuto->fetch()) {
+											echo '"'.$rowAuto['category'].'", ';
+										}
+										?>
 									];
 									$( "#category" ).autocomplete({source: availableTags});
 								});
@@ -236,16 +235,16 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 						<td class="right">
 							<?php
                             $yearGroups = getYearGroups($connection2);
-            if ($yearGroups == '') {
-                echo '<i>'.__($guid, 'No year groups available.').'</i>';
-            } else {
-                for ($i = 0; $i < count($yearGroups); $i = $i + 2) {
-                    $checked = 'checked ';
-                    echo __($guid, $yearGroups[($i + 1)])." <input $checked type='checkbox' name='gibbonYearGroupIDCheck".($i) / 2 ."'><br/>";
-                    echo "<input type='hidden' name='gibbonYearGroupID".($i) / 2 ."' value='".$yearGroups[$i]."'>";
-                }
-            }
-            ?>
+							if ($yearGroups == '') {
+								echo '<i>'.__($guid, 'No year groups available.').'</i>';
+							} else {
+								for ($i = 0; $i < count($yearGroups); $i = $i + 2) {
+									$checked = 'checked ';
+									echo __($guid, $yearGroups[($i + 1)])." <input $checked type='checkbox' name='gibbonYearGroupIDCheck".($i) / 2 ."'><br/>";
+									echo "<input type='hidden' name='gibbonYearGroupID".($i) / 2 ."' value='".$yearGroups[$i]."'>";
+								}
+							}
+							?>
 							<input type="hidden" name="count" value="<?php echo(count($yearGroups)) / 2 ?>">
 						</td>
 					</tr>
@@ -258,13 +257,11 @@ if (isActionAccessible($guid, $connection2, '/modules/Visual Assessment/guides_m
 
 					<tr>
 						<td>
-							<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field');
-            ?></i></span>
+							<span style="font-size: 90%"><i>* <?php echo __($guid, 'denotes a required field'); ?></i></span>
 						</td>
 						<td class="right">
 							<input type="hidden" name="address" value="<?php echo $_SESSION[$guid]['address'] ?>">
-							<input type="submit" value="<?php echo __($guid, 'Submit');
-            ?>">
+							<input type="submit" value="<?php echo __($guid, 'Submit'); ?>">
 						</td>
 					</tr>
 				</table>
